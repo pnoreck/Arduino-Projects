@@ -6,20 +6,20 @@ int motorChannel[2] = {12, 13};
 
 
 // Runde: 75
-const int loop_circle_max = 500; // Anzahl Bilder insgesamt
+const int loop_circle_max = 10; // Anzahl Bilder insgesamt
 int loop_circle = loop_circle_max;
 
 // Start-Button
 const int buttonPin = 2;     // the number of the pushbutton pin
 
 // Runde 350
-const int table_turn_duration = 150;
+const int table_turn_duration = 200;
+
+// Runde 122
+const int motor_speed = 150;
 
 // Warte
 const int wait_before_photo = 2000;
-
-// Runde 122
-const int motor_speed = 122;
 
 // variables will change:
 int buttonState = 0;         // variable for reading the pushbutton status
@@ -130,6 +130,6 @@ void loop(){
   if (buttonState == HIGH) {
     loop_circle = 0;
   }
-  
+  loop_circle = 0;
   check_for_loop();
 }
