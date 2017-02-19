@@ -7,6 +7,8 @@
  * B- = blue
  */
 
+#define UNDEFINED 666
+
 // Delay between each step
 int delaylegnth = 20;
 
@@ -23,16 +25,16 @@ int chA[]   = {LOW, HIGH, LOW, HIGH};
 int chB[]   = {HIGH, LOW, HIGH, LOW};
 
 //Moves CH A
-int pin3[]  = {255, NULL, 255, NULL};
+int pin3[]  = {255, UNDEFINED, 255, UNDEFINED};
 
 //Moves CH B
-int pin11[] = {NULL, 255, NULL, 255};
+int pin11[] = {UNDEFINED, 255, UNDEFINED, 255};
 
 //Sets direction of CH A
-int pin12[] = {HIGH, NULL, LOW, NULL};
+int pin12[] = {HIGH, UNDEFINED, LOW, UNDEFINED};
 
 //Sets direction of CH B
-int pin13[] = {NULL, HIGH, NULL, LOW};
+int pin13[] = {UNDEFINED, HIGH, UNDEFINED, LOW};
 
 // Pin of the camera remote
 const short cameraPin = 4;
@@ -58,6 +60,7 @@ void setup() {
   pinMode(cameraPin, OUTPUT);
   pinMode(startButtonPin, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(startButtonPin), startStop, RISING);  
+
 }
 
 /**
@@ -71,19 +74,19 @@ void setStep(short stepToSet) {
   digitalWrite(9, chA[stepToSet]);
   digitalWrite(8, chB[stepToSet]);
 
-  if(pin3[stepToSet] != NULL) {
+  if(pin3[stepToSet] != UNDEFINED) {
     analogWrite(3, pin3[stepToSet]);
   }
 
-  if(pin11[stepToSet] != NULL) {
+  if(pin11[stepToSet] != UNDEFINED) {
     analogWrite(11, pin11[stepToSet]);
   }
   
-  if(pin12[stepToSet] != NULL) {
+  if(pin12[stepToSet] != UNDEFINED) {
     digitalWrite(12, pin12[stepToSet]);
   }
 
-  if(pin13[stepToSet] != NULL) {
+  if(pin13[stepToSet] != UNDEFINED) {
     digitalWrite(13, pin13[stepToSet]);
   }
   
