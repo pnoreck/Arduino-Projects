@@ -5,9 +5,18 @@
  * A- = green
  * B+ = red
  * B- = blue
+ * 
+ * 4006 steps for one round
  */
 
+// We define undefined with 666
 #define UNDEFINED 666
+
+// Debug mode on / off
+#define DEBUG true
+
+// Total steps for one round
+#define ONE_ROUND 4004
 
 // Delay between each step
 int delaylegnth = 20;
@@ -15,7 +24,10 @@ int delaylegnth = 20;
 // Current step (can have a value of 0 till 3)
 short currentStep = 0;
 
-// 
+// Debug step counter
+int loop_count = 0;
+
+// Start and stop the turn table
 volatile byte startStopMode = LOW;
 
 // PIN 9
@@ -42,6 +54,12 @@ const short cameraPin = 4;
 // Pin of the input button
 const short startButtonPin = 2;
 
+// Pictures during one round
+short countPicturesPerRound = 20;
+
+// Steps between the pictures (calculated)
+int stepsBetweenPictures = 0;
+
 /**
  * Initialize the motor shield pins for the stepper motor
  */
@@ -60,6 +78,12 @@ void setup() {
   pinMode(cameraPin, OUTPUT);
   pinMode(startButtonPin, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(startButtonPin), startStop, RISING);  
+
+  stepsBetweenPictures = ONE_ROUND / countPicturesPerRound;
+  
+  if(DEBUG) {
+    Serial.begin(9600);
+  }
 
 }
 
@@ -92,10 +116,20 @@ void setStep(short stepToSet) {
   
 }
 
+/**
+ * Start / stop trigger function
+ */
 void startStop() {
   startStopMode = !startStopMode;
+  if(startStopMode) {
+    // reset debug loop value
+    loop_count = 0;
+  }
 }
 
+/**
+ * Do one step forward
+ */
 void stepForward() {
   currentStep += 1;
   if(currentStep > 3) {
@@ -105,6 +139,10 @@ void stepForward() {
   delay(delaylegnth);
 }
 
+
+/**
+ * Do one step backward
+ */
 void stepBackward() {
   currentStep -= 1;
   if(currentStep < 0) {
@@ -115,8 +153,46 @@ void stepBackward() {
 }
 
 
+/**
+ * Do the specified amount of steps forward 
+ */
+void doStepsForward(int steps) {
+  for(int i = 0; i < steps; i++) {
+    stepForward();
+
+    if(DEBUG) {
+      Serial.print("var i = ");
+      Serial.println(i);      
+    }
+  }
+}
+
+/**
+ * Press the remote control and make a picture
+ */
+void makePicture() {
+  digitalWrite(cameraPin, HIGH);
+  delay(500);
+  digitalWrite(cameraPin, LOW);
+}
+
+
 void loop() {
   if(startStopMode) {
-    stepForward();
+    doStepsForward(stepsBetweenPictures);
+    loop_count++;
+    
+    if(DEBUG) {
+      Serial.println(loop_count);
+    }
+    
+    if(loop_count == countPicturesPerRound) {
+      startStopMode = !startStopMode;
+    }
+    else {
+      delay(200);
+      makePicture();
+      delay(500);
+    }
   }
 }
