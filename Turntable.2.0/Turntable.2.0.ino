@@ -28,24 +28,22 @@ const short startButtonPin = 2;
 // Steps between the pictures (calculated)
 int stepsBetweenPictures = 0;
 
-// Pin of the camera remote
-const short cameraPin = 4;
+
+// Interruptons: pin 3 = interrupt 1 in Arduino Uno & Mega
+volatile boolean isTriggered = false;
 
 
 /**
    Initialize the motor shield pins for the stepper motor
 */
 void setup() {
-
-  initializeMotor();
   
-  pinMode(cameraPin, OUTPUT);
   pinMode(startButtonPin, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(startButtonPin), startStop, RISING);
-  
 
+  initializeMotor();
   initializeDisplay();
- 
+  initializeCamera();
 }
 
 /**
@@ -67,7 +65,8 @@ void startStop() {
    button we loop again without doing anything.
 */
 void loop() {
-
+  
+  checkForButtons();
   
   if (startStopMode) {
     doStepsForward(stepsBetweenPictures);
@@ -76,10 +75,9 @@ void loop() {
     if (DEBUG) {
       Serial.println(loop_count);
     }
+    
+    takePicture();
 
-    delay(200);
-    makePicture();
-    delay(500);
 
     if (loop_count == getPicturesPerRound()) {
       startStopMode = !startStopMode;
