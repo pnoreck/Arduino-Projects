@@ -5,11 +5,16 @@
 //****************************************************************
 
 //Pin connected to ST_CP of 74HC595
-int latchPin = 8;
+// int latchPin = 8;  // Arduino
+int latchPin = 1;  // Attiny
+
 //Pin connected to SH_CP of 74HC595
-int clockPin = 12;
+// int clockPin = 12;
+int clockPin = 2;
+
 ////Pin connected to DS of 74HC595
-int dataPin = 11;
+// int dataPin = 11;
+int dataPin = 0;
 
 int blinkDelay = 500;
 
@@ -18,51 +23,20 @@ void setup() {
   pinMode(latchPin, OUTPUT);
   pinMode(clockPin, OUTPUT);
   pinMode(dataPin, OUTPUT);
-  Serial.begin(9600);
+  // Serial.begin(9600);
 }
 
 int lut[] = {
 
-  // 0-9 = 0-9
-  243,  // 0
-  96,   // 1
-  213,  // 2
-  244,  // 3
-  102,  // 4
-  182,  // 5
-  183,  // 6
-  224,  // 7
-  247,  // 8
-  246,  // 9
-
-  // 10-19 = 0.-9.
-  251,  // 0.
-  104,  // 1.
-  221,  // 2.
-  252,  // 3.
-  110,  // 4.
-  190,  // 5.
-  191,  // 6.
-  232,  // 7.
-  255,  // 8.
-  254,  // 9.
-
-  // 20-33 char
-  231,  // A    20
-  239,  // A.
-  151,  // E
-  159,  // E.
-  39,   // h
-  103,  // H    25
-  111,  // H.
-  112,  // J
-  121,  // J.
-  115,  // U
-  123,  // U.   30
-  53,   // o
-  198,  // °
-  148,  // burger
-
+  0,    // 0
+  1,    // 1
+  3,    // 2
+  131,  // 3
+  195,  // 4
+  227,  // 5
+  243,  // 6
+  251,  // 7
+  255,  // 8
 
 };
 
@@ -70,8 +44,8 @@ int lut[] = {
 void shiftToDisplay(int mapKey) {
 
   int numberToDisplay = lut[mapKey];
-  Serial.println(mapKey);
-  Serial.println(numberToDisplay);
+  // Serial.println(mapKey);
+  // Serial.println(numberToDisplay);
 
   // take the latchPin low so
   // the LEDs don't change while you're sending in bits:
@@ -101,9 +75,13 @@ void shiftOutNumber(int numberToDisplay) {
   //return the latch pin high to signal chip that it
   //no longer needs to listen for information
   digitalWrite(latchPin, HIGH);
-  Serial.println(numberToDisplay);
+  // Serial.println(numberToDisplay);
 }
 
+void shiftOutMapped(int mapKey) {
+  int numberToDisplay = lut[mapKey];
+  shiftOutNumber(numberToDisplay);
+}
 
 void loop() {
   /*
@@ -111,12 +89,23 @@ void loop() {
     blinkNumber(number, 60);
     }
   */
-
+/*
   for (int number = 0; number <= 255; number++) {
     shiftOutNumber(number);
-    delay(500);
+    delay(350);
+  }
+  */
+
+  for (int number = 0; number <= 8; number++) {
+    shiftOutMapped(number);
+    delay(50);
+  }
+  
+  for (int number = 8; number >= 0; number--) {
+    shiftOutMapped(number);
+    delay(1500);
   }
 
-
+  delay(1000); 
 }
 
